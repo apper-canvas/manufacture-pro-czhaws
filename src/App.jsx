@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 
@@ -41,18 +41,18 @@ function App() {
       >
         <header className="sticky top-0 z-50 bg-blur border-b border-surface-200 dark:border-surface-700">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">M</div>
               <span className="text-xl font-bold hidden sm:block">ManufacturePro</span>
-            </a>
+            </Link>
             
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Home</a>
-              <a href="/about" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">About Us</a>
-              <a href="#products" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Products</a>
-              <a href="#capabilities" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Capabilities</a>
-              <a href="#quality" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Quality</a>
-              <a href="#contact" className="btn btn-primary">Contact Us</a>
+              <Link to="/" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Home</Link>
+              <Link to="/about" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">About Us</Link>
+              <Link to="/#products" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Products</Link>
+              <Link to="/#capabilities" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Capabilities</Link>
+              <Link to="/#quality" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Quality</Link>
+              <Link to="/#contact" className="btn btn-primary">Contact Us</Link>
             </nav>
             
             <div className="flex items-center space-x-4">
@@ -129,12 +129,12 @@ function App() {
               <div>
                 <h3 className="text-xl font-bold mb-4">Quick Links</h3>
                 <ul className="space-y-2">
-                  <li><a href="/" className="text-surface-300 hover:text-white">Home</a></li>
-                  <li><a href="/about" className="text-surface-300 hover:text-white">About Us</a></li>
-                  <li><a href="#products" className="text-surface-300 hover:text-white">Products</a></li>
-                  <li><a href="#capabilities" className="text-surface-300 hover:text-white">Capabilities</a></li>
-                  <li><a href="#quality" className="text-surface-300 hover:text-white">Quality Standards</a></li>
-                  <li><a href="#contact" className="text-surface-300 hover:text-white">Contact</a></li>
+                  <li><Link to="/" className="text-surface-300 hover:text-white">Home</Link></li>
+                  <li><Link to="/about" className="text-surface-300 hover:text-white">About Us</Link></li>
+                  <li><Link to="/#products" className="text-surface-300 hover:text-white">Products</Link></li>
+                  <li><Link to="/#capabilities" className="text-surface-300 hover:text-white">Capabilities</Link></li>
+                  <li><Link to="/#quality" className="text-surface-300 hover:text-white">Quality Standards</Link></li>
+                  <li><Link to="/#contact" className="text-surface-300 hover:text-white">Contact</Link></li>
                 </ul>
               </div>
               
