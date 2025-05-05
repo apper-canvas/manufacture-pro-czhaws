@@ -1,18 +1,38 @@
-import { useState, useEffect } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect, createContext } from 'react';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion } from 'framer-motion';
+import { setUser, clearUser } from './store/userSlice';
 
 // Pages
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
 import NotFound from './pages/NotFound';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ContactRequests from './pages/ContactRequests';
+
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
+
+// Create auth context
+export const AuthContext = createContext(null);
 
 function App() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem('darkMode') === 'true' || 
     window.matchMedia('(prefers-color-scheme: dark)').matches
   );
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Get authentication status
+  const userState = useSelector((state) => state.user);
+  const isAuthenticated = userState?.isAuthenticated || false;
 
   useEffect(() => {
     if (darkMode) {
@@ -23,6 +43,40 @@ function App() {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
+  // Initialize ApperUI once when the app loads
+  useEffect(() => {
+    const { ApperClient, ApperUI } = window.ApperSDK;
+    const client = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    
+    // Initialize but don't show login yet
+    ApperUI.setup(client, {
+      target: '#authentication',
+      clientId: import.meta.env.VITE_APPER_PROJECT_ID,
+      view: 'both',
+      onSuccess: function(user) {
+        // Store user data in Redux store
+        let currentPath = window.location.pathname + window.location.search;
+        if (user && user.isAuthenticated) {
+          dispatch(setUser(user));
+          if (currentPath.includes('login') || currentPath.includes('signup')) {
+            navigate('/dashboard');
+          }
+        } else if (!currentPath.includes('login')) {
+          navigate('/login');
+        }
+      },
+      onError: function(error) {
+        console.error("Authentication failed:", error);
+        toast.error("Authentication failed. Please try again.");
+      }
+    });
+    
+    setIsInitialized(true);
+  }, [dispatch, navigate]);
+
   const toggleDarkMode = () => {
     setDarkMode(prev => !prev);
     toast.info(
@@ -31,8 +85,25 @@ function App() {
     );
   };
 
+  // Authentication methods to share via context
+  const authMethods = {
+    isInitialized,
+    logout: async () => {
+      try {
+        const { ApperUI } = window.ApperSDK;
+        await ApperUI.logout();
+        dispatch(clearUser());
+        navigate('/login');
+        toast.success("Logged out successfully");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        toast.error("Logout failed. Please try again.");
+      }
+    }
+  };
+
   return (
-    <>
+    <AuthContext.Provider value={authMethods}>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -49,10 +120,25 @@ function App() {
             <nav className="hidden md:flex items-center space-x-8">
               <Link to="/" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Home</Link>
               <Link to="/about" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">About Us</Link>
-              <Link to="/#products" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Products</Link>
-              <Link to="/#capabilities" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Capabilities</Link>
-              <Link to="/#quality" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Quality</Link>
-              <Link to="/#contact" className="btn btn-primary">Contact Us</Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Dashboard</Link>
+                  <Link to="/contact-requests" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Contact Requests</Link>
+                  <button 
+                    onClick={authMethods.logout}
+                    className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/#products" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Products</Link>
+                  <Link to="/#capabilities" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Capabilities</Link>
+                  <Link to="/#quality" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Quality</Link>
+                  <Link to="/#contact" className="btn btn-primary">Contact Us</Link>
+                </>
+              )}
             </nav>
             
             <div className="flex items-center space-x-4">
@@ -93,8 +179,22 @@ function App() {
 
         <main className="flex-grow">
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<AboutUs />} />
+            
+            {/* Auth routes - accessible only when NOT authenticated */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </Route>
+            
+            {/* Protected routes - require authentication */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/contact-requests" element={<ContactRequests />} />
+            </Route>
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
@@ -185,7 +285,7 @@ function App() {
         theme={darkMode ? "dark" : "light"}
         toastClassName="rounded-lg shadow-lg"
       />
-    </>
+    </AuthContext.Provider>
   );
 }
 

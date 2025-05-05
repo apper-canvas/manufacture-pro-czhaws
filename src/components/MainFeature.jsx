@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
+import { contactService } from '../services/ContactService';
 
 const MainFeature = () => {
   // Get icons
@@ -162,8 +163,8 @@ const MainFeature = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Submit contact request to Apper backend
+      await contactService.createContactRequest(formData);
       
       // Success
       setSubmitted(true);
@@ -185,6 +186,7 @@ const MainFeature = () => {
         setCurrentStep(1);
       }, 5000);
     } catch (error) {
+      console.error("Error submitting contact request:", error);
       toast.error('There was an error submitting your request. Please try again.');
     } finally {
       setIsSubmitting(false);
