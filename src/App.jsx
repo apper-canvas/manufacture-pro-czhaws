@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 
 // Pages
 import Home from './pages/Home';
+import AboutUs from './pages/AboutUs';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -46,6 +47,8 @@ function App() {
             </a>
             
             <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Home</a>
+              <a href="/about" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">About Us</a>
               <a href="#products" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Products</a>
               <a href="#capabilities" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Capabilities</a>
               <a href="#quality" className="text-surface-700 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition">Quality</a>
@@ -91,6 +94,7 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<AboutUs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
@@ -125,10 +129,11 @@ function App() {
               <div>
                 <h3 className="text-xl font-bold mb-4">Quick Links</h3>
                 <ul className="space-y-2">
+                  <li><a href="/" className="text-surface-300 hover:text-white">Home</a></li>
+                  <li><a href="/about" className="text-surface-300 hover:text-white">About Us</a></li>
                   <li><a href="#products" className="text-surface-300 hover:text-white">Products</a></li>
                   <li><a href="#capabilities" className="text-surface-300 hover:text-white">Capabilities</a></li>
                   <li><a href="#quality" className="text-surface-300 hover:text-white">Quality Standards</a></li>
-                  <li><a href="#about" className="text-surface-300 hover:text-white">About Us</a></li>
                   <li><a href="#contact" className="text-surface-300 hover:text-white">Contact</a></li>
                 </ul>
               </div>
